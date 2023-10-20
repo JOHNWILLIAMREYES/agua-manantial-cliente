@@ -52,7 +52,6 @@ export class LoginUserComponent implements OnInit {
     });
 
     const usuario = JSON.parse(objetoJSON);
-    console.log('Objeto JSON recibido en el diálogo:', usuario);
     if (usuario) {
       this.cliente = usuario;
 
@@ -133,7 +132,6 @@ export class LoginUserComponent implements OnInit {
 
   aceptar(): void {
     this.estadoComponente = LOAD_COMPONENT.load;
-    console.log('Campos validos? ', this.dialogForm.valid);
 
     if (this.dialogForm.valid) {
       const valorcedula = this.dialogForm.controls['cedula'].value;
@@ -146,7 +144,6 @@ export class LoginUserComponent implements OnInit {
 
   subscribirse(): void {
     var nuevoCliente: User = new User();
-    console.log('Campos validos subs? ', this.dialogFormRegistro.valid);
 
     nuevoCliente.user_id = 1;
     nuevoCliente.name = this.dialogFormRegistro.controls['nombre'].value;
