@@ -7,7 +7,10 @@ import { QuienesSomosComponent } from './views/quienes-somos/quienes-somos.compo
 import { HistorialClienteComponent } from './views/historial-cliente/historial-cliente.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
+  {
+    path: '',
+    component: HomeComponent,
+  },
   { path: 'login', component: LoginComponent },
   { path: 'orders', component: OrdersComponent },
   { path: 'quienessomos', component: QuienesSomosComponent },
@@ -15,7 +18,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes), RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

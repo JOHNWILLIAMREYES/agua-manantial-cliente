@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/users/users.service';
+import Swal from 'sweetalert2';
 
 const LOAD_COMPONENT = Object.freeze({
   load: 1,
@@ -52,6 +53,7 @@ export class LoginUserComponent implements OnInit {
     });
 
     const usuario = JSON.parse(objetoJSON);
+    console.log('Objeto JSON recibido en el diálogo:', usuario);
     if (usuario) {
       this.cliente = usuario;
 
@@ -132,6 +134,7 @@ export class LoginUserComponent implements OnInit {
 
   aceptar(): void {
     this.estadoComponente = LOAD_COMPONENT.load;
+    console.log('Campos validos? ', this.dialogForm.valid);
 
     if (this.dialogForm.valid) {
       const valorcedula = this.dialogForm.controls['cedula'].value;
@@ -144,6 +147,7 @@ export class LoginUserComponent implements OnInit {
 
   subscribirse(): void {
     var nuevoCliente: User = new User();
+    console.log('Campos validos subs? ', this.dialogFormRegistro.valid);
 
     nuevoCliente.user_id = 1;
     nuevoCliente.name = this.dialogFormRegistro.controls['nombre'].value;
@@ -168,7 +172,7 @@ export class LoginUserComponent implements OnInit {
         if (isObject) {
           console.log('El resultado ES* un objeto', isObject);
           console.log('ID nuevo cliente', res.user_id);
-          this.buscarUsuario(nuevoCliente.identification, '');
+          this.buscarUsuario(nuevoCliente.identification, nuevoCliente.email);
         } else {
           console.log('El resultadon NO* es un objeto', isObject);
         }
@@ -186,24 +190,65 @@ export class LoginUserComponent implements OnInit {
       .getById('find-by-identification/' + valorcedula)
       .subscribe((user) => {
         if (user === null) {
-          this.estadoComponente = LOAD_COMPONENT.modalRegistrarse;
 
-          const valorcedula = this.dialogForm.controls['cedula'].value;
-          const valoremail = this.dialogForm.controls['email'].value;
-          // Asignar los valores al dialogFormRegistro
-          this.dialogFormRegistro.patchValue({
-            cedula: valorcedula,
-            email: valoremail,
-          });
-          this.crearUsuario(valorcedula);
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          })
+          
+          Toast.fire({
+            icon: 'error',
+            title: 'El correo electrónico y/o número de cedula que ingresaste no coinciden a una cuenta registrada'
+          })
+          this.estadoComponente = LOAD_COMPONENT.modalLogin;
+          //this.crearUsuario(valorcedula);
         } else {
-          this.cliente = user;
-          this.dialogRef.close(this.cliente);
+          if(user.email == valoremail){
+            this.cliente = user;
+            this.dialogRef.close(this.cliente);
+          } else {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'top',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            })
+            
+            Toast.fire({
+              icon: 'info',
+              title: 'El número de cedula no coincide con el correo electrónico ingresado'
+            })
+          }
+          this.estadoComponente = LOAD_COMPONENT.modalLogin;
         }
       });
   }
-
-  crearUsuario(valorcedula: number) {
+  crearsubscripcion() {
+    console.log('OPEN subscripcion');
     this.registrarUsuario = true;
+    const valorcedula = this.dialogForm.controls['cedula'].value;
+    const valoremail = this.dialogForm.controls['email'].value;
+    // Asignar los valores al dialogFormRegistro
+    this.dialogFormRegistro.patchValue({
+      cedula: valorcedula,
+      email: valoremail,
+    });
+    const cedulaControl = this.dialogFormRegistro.get('cedula');
+    if (cedulaControl) {
+      cedulaControl.disable();
+    }
+    this.estadoComponente = LOAD_COMPONENT.modalRegistrarse;
   }
 }
